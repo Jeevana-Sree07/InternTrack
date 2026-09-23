@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>InternTrack - Apply</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            InternTrack
+        </div>
+
+        <div class="nav-links">
+
+            <a href="/">Dashboard</a>
+
+            <a href="/internships">
+                Internships
+            </a>
+
+            <a href="/applications">
+                Applications
+            </a>
+
+            <a href="/interviews">
+                Interviews
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Main Content -->
+
+    <main class="container">
+
+        <section class="welcome">
+
+            <h1>Apply for Internship</h1>
+
+            <p>
+                Submit your application for the selected internship.
+            </p>
+
+        </section>
+
+
+        <!-- Internship Details -->
+
+        <section class="apply-layout">
+
+
+            <div class="internship-card">
+
+                <div class="company">
+                    {{ internship.company_name }}
+                </div>
+
+                <h2>
+                    {{ internship.title }}
+                </h2>
+
+                <p class="description">
+                    {{ internship.description }}
+                </p>
+
+                <div class="internship-info">
+
+                    <span>
+                        📍 {{ internship.location }}
+                    </span>
+
+                    <span>
+                        💰 ₹{{ internship.stipend }}
+                    </span>
+
+                    <span>
+                        📅 Deadline: {{ internship.deadline }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- Application Form -->
+
+            <div class="application-form">
+
+                <h2>Application Form</h2>
+
+                <form method="POST">
+
+                    <label for="student_id">
+                        Select Student
+                    </label>
+
+                    <select name="student_id"
+                            id="student_id"
+                            required>
+
+                        <option value="">
+                            -- Select Student --
+                        </option>
+
+                        {% for student in students %}
+
+                        <option value="{{ student.student_id }}">
+
+                            {{ student.name }} -
+                            {{ student.email }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+
+                    <button type="submit">
+                        Submit Application
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>InternTrack - Internships</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            InternTrack
+        </div>
+
+        <div class="nav-links">
+
+            <a href="/">
+                Dashboard
+            </a>
+
+            <a href="/internships">
+                Internships
+            </a>
+
+            <a href="/applications">
+                Applications
+            </a>
+
+            <a href="/interviews">
+                Interviews
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Main Content -->
+
+    <main class="container">
+
+        <section class="welcome">
+
+            <h1>Available Internships</h1>
+
+            <p>
+                Explore internship opportunities and find the right role for you.
+            </p>
+
+        </section>
+
+
+        <!-- Skill Search -->
+
+        <section class="skill-search">
+
+            <form method="GET" action="/internships">
+
+                <label for="skill">
+                    Search by Skill
+                </label>
+
+                <select name="skill" id="skill">
+
+                    <option value="">
+                        All Skills
+                    </option>
+
+                    {% for skill in skills %}
+
+                    <option value="{{ skill.skill_name }}"
+                        {% if selected_skill == skill.skill_name %}
+                            selected
+                        {% endif %}>
+
+                        {{ skill.skill_name }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <button type="submit">
+                    Search
+                </button>
+
+                <a href="/internships" class="clear-button">
+                    Clear
+                </a>
+
+            </form>
+
+        </section>
+
+
+        <!-- Internship Cards -->
+
+        <section class="internship-grid">
+
+            {% for internship in internships %}
+
+            <div class="internship-card">
+
+                <div class="company">
+                    {{ internship.company_name }}
+                </div>
+
+                <h2>
+                    {{ internship.title }}
+                </h2>
+
+                <p class="description">
+                    {{ internship.description }}
+                </p>
+
+                <div class="internship-info">
+
+                    <span>
+                        📍 {{ internship.location }}
+                    </span>
+
+                    <span>
+                        💰 ₹{{ internship.stipend }}
+                    </span>
+
+                    <span>
+                        📅 Deadline: {{ internship.deadline }}
+                    </span>
+
+                </div>
+
+
+                <!-- Apply Button -->
+
+                <a href="/apply/{{ internship.internship_id }}"
+                   class="apply-button">
+
+                    Apply Now
+
+                </a>
+
+            </div>
+
+            {% else %}
+
+            <p>
+                No internships found for the selected skill.
+            </p>
+
+            {% endfor %}
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

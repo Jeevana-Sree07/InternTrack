@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>InternTrack - Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+
+        <div class="logo">
+            InternTrack
+        </div>
+
+        <div class="nav-links">
+
+            <a href="/">Dashboard</a>
+
+            <a href="/internships">
+                Internships
+            </a>
+
+            <a href="/applications">
+                Applications
+            </a>
+
+            <a href="/interviews">
+                Interviews
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <!-- Welcome Section -->
+        <section class="welcome">
+
+            <h1>Internship Tracking Dashboard</h1>
+
+            <p>
+                Track your internship opportunities, applications and interviews in one place.
+            </p>
+
+        </section>
+
+
+        <!-- Statistics -->
+        <section class="stats">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">💼</div>
+
+                <div>
+                    <h3>{{ total_internships }}</h3>
+                    <p>Total Internships</p>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">📝</div>
+
+                <div>
+                    <h3>{{ total_applications }}</h3>
+                    <p>Total Applications</p>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">🎯</div>
+
+                <div>
+                    <h3>{{ interviews }}</h3>
+                    <p>Interviews</p>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">🏆</div>
+
+                <div>
+                    <h3>{{ selected }}</h3>
+                    <p>Selected</p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Quick Actions -->
+        <section class="actions">
+
+            <h2>Quick Actions</h2>
+
+            <div class="action-grid">
+
+
+                <!-- Browse Internships -->
+                <a href="/internships" class="action-card">
+
+                    <span>🔎</span>
+
+                    <h3>Browse Internships</h3>
+
+                    <p>
+                        Explore available internship opportunities.
+                    </p>
+
+                </a>
+
+
+                <!-- My Applications -->
+                <a href="/applications" class="action-card">
+
+                    <span>📋</span>
+
+                    <h3>My Applications</h3>
+
+                    <p>
+                        Track the status of your applications.
+                    </p>
+
+                </a>
+
+
+                <!-- Interviews -->
+                <a href="/interviews" class="action-card">
+
+                    <span>🎤</span>
+
+                    <h3>Interviews</h3>
+
+                    <p>
+                        Manage your upcoming interview rounds.
+                    </p>
+
+                </a>
+
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

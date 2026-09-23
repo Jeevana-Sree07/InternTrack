@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>InternTrack - Applications</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            InternTrack
+        </div>
+
+        <div class="nav-links">
+
+            <a href="/">Dashboard</a>
+
+            <a href="/internships">
+                Internships
+            </a>
+
+            <a href="/applications">
+                Applications
+            </a>
+
+            <a href="/interviews">
+    Interviews
+</a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Main Content -->
+
+    <main class="container">
+
+        <section class="welcome">
+
+            <h1>My Applications</h1>
+
+            <p>
+                Track the status of your internship applications.
+            </p>
+
+        </section>
+
+
+        <!-- Applications Table -->
+
+        <section class="applications-section">
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Student</th>
+
+                            <th>Company</th>
+
+                            <th>Internship</th>
+
+                            <th>Application Date</th>
+
+                            <th>Status</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for application in applications %}
+
+                        <tr>
+
+                            <td>
+                                {{ application.student_name }}
+                            </td>
+
+                            <td>
+                                {{ application.company_name }}
+                            </td>
+
+                            <td>
+                                {{ application.internship_title }}
+                            </td>
+
+                            <td>
+                                {{ application.application_date }}
+                            </td>
+
+                            <td>
+
+                                <span class="status
+                                    {% if application.status == 'Selected' %}
+                                        selected
+                                    {% elif application.status == 'Rejected' %}
+                                        rejected
+                                    {% elif application.status == 'Interview' %}
+                                        interview
+                                    {% elif application.status == 'Shortlisted' %}
+                                        shortlisted
+                                    {% else %}
+                                        applied
+                                    {% endif %}
+                                ">
+
+                                    {{ application.status }}
+
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

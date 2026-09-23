@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>InternTrack - Interviews</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            InternTrack
+        </div>
+
+        <div class="nav-links">
+
+            <a href="/">Dashboard</a>
+
+            <a href="/internships">
+                Internships
+            </a>
+
+            <a href="/applications">
+                Applications
+            </a>
+
+            <a href="/interviews">
+                Interviews
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <main class="container">
+
+        <section class="welcome">
+
+            <h1>Interview Tracker</h1>
+
+            <p>
+                Track your internship interview rounds, results and feedback.
+            </p>
+
+        </section>
+
+
+        <section class="applications-section">
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Student</th>
+
+                            <th>Company</th>
+
+                            <th>Internship</th>
+
+                            <th>Round</th>
+
+                            <th>Interview Date</th>
+
+                            <th>Result</th>
+
+                            <th>Feedback</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for interview in interviews %}
+
+                        <tr>
+
+                            <td>
+                                {{ interview.student_name }}
+                            </td>
+
+                            <td>
+                                {{ interview.company_name }}
+                            </td>
+
+                            <td>
+                                {{ interview.internship_title }}
+                            </td>
+
+                            <td>
+                                Round {{ interview.round_number }}
+                            </td>
+
+                            <td>
+                                {{ interview.interview_date }}
+                            </td>
+
+                            <td>
+
+                                <span class="status
+                                    {% if interview.result == 'Passed' %}
+                                        selected
+                                    {% elif interview.result == 'Failed' %}
+                                        rejected
+                                    {% else %}
+                                        interview
+                                    {% endif %}
+                                ">
+
+                                    {{ interview.result }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+                                {{ interview.feedback or 'No feedback yet' }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>
