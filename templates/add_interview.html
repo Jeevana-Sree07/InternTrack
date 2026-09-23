@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>InternTrack - Add Interview</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            InternTrack
+        </div>
+
+        <div class="nav-links">
+
+            <a href="/">
+                Dashboard
+            </a>
+
+            <a href="/internships">
+                Internships
+            </a>
+
+            <a href="/applications">
+                Applications
+            </a>
+
+            <a href="/interviews">
+                Interviews
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Main Content -->
+
+    <main class="container">
+
+        <section class="welcome">
+
+            <h1>Add Interview</h1>
+
+            <p>
+                Schedule and record an internship interview round.
+            </p>
+
+        </section>
+
+
+        <!-- Interview Form -->
+
+        <section class="application-form">
+
+            <form method="POST">
+
+
+                <!-- Application -->
+
+                <label for="application_id">
+                    Application
+                </label>
+
+                <select name="application_id"
+                        id="application_id"
+                        required>
+
+                    <option value="">
+                        -- Select Application --
+                    </option>
+
+                    {% for application in applications %}
+
+                    <option value="{{ application.application_id }}">
+
+                        {{ application.student_name }}
+                        -
+                        {{ application.company_name }}
+                        -
+                        {{ application.internship_title }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+
+                <!-- Round Number -->
+
+                <label for="round_number">
+                    Interview Round
+                </label>
+
+                <input type="number"
+                       name="round_number"
+                       id="round_number"
+                       min="1"
+                       required>
+
+
+                <!-- Interview Date -->
+
+                <label for="interview_date">
+                    Interview Date
+                </label>
+
+                <input type="date"
+                       name="interview_date"
+                       id="interview_date"
+                       required>
+
+
+                <!-- Result -->
+
+                <label for="result">
+                    Result
+                </label>
+
+                <select name="result"
+                        id="result"
+                        required>
+
+                    <option value="Pending">
+                        Pending
+                    </option>
+
+                    <option value="Passed">
+                        Passed
+                    </option>
+
+                    <option value="Failed">
+                        Failed
+                    </option>
+
+                </select>
+
+
+                <!-- Feedback -->
+
+                <label for="feedback">
+                    Feedback
+                </label>
+
+                <textarea name="feedback"
+                          id="feedback"
+                          rows="4"
+                          placeholder="Enter interview feedback"></textarea>
+
+
+                <!-- Submit -->
+
+                <button type="submit">
+                    Add Interview
+                </button>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

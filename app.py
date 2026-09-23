@@ -227,6 +227,115 @@ def applications():
     )
 
 
+@app.route("/update-status/<int:application_id>", methods=["POST"])
+def update_status(application_id):
+
+    status = request.form["status"]
+
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    try:
+
+        cursor.execute("""
+            UPDATE Application
+            SET status = %s
+            WHERE application_id = %s
+        """, (status, application_id))
+
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        return redirect(url_for("applications"))
+
+    except Exception as error:
+
+        connection.rollback()
+
+        cursor.close()
+        connection.close()
+
+        return f"Status update failed: {error}", 400
+@app.route("/add-interview", methods=["GET", "POST"])
+def add_interview():
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    if request.method == "POST":
+
+        application_id = request.form["application_id"]
+        round_number = request.form["round_number"]
+        interview_date = request.form["interview_date"]
+        result = request.form["result"]
+        feedback = request.form["feedback"]
+
+        try:
+
+            cursor.execute("""
+                INSERT INTO Interview
+                (application_id, round_number, interview_date, result, feedback)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (
+                application_id,
+                round_number,
+                interview_date,
+                result,
+                feedback
+            ))
+
+            cursor.execute("""
+                UPDATE Application
+                SET status = 'Interview'
+                WHERE application_id = %s
+            """, (application_id,))
+
+            connection.commit()
+
+            cursor.close()
+            connection.close()
+
+            return redirect(url_for("interviews_page"))
+
+        except Exception as error:
+
+            connection.rollback()
+
+            cursor.close()
+            connection.close()
+
+            return f"Interview creation failed: {error}", 400
+
+
+    cursor.execute("""
+        SELECT
+            a.application_id,
+            s.name AS student_name,
+            c.company_name,
+            i.title AS internship_title
+        FROM Application a
+        JOIN Student s
+            ON a.student_id = s.student_id
+        JOIN Internship i
+            ON a.internship_id = i.internship_id
+        JOIN Company c
+            ON i.company_id = c.company_id
+        WHERE a.status IN ('Shortlisted', 'Interview')
+        ORDER BY a.application_id
+    """)
+
+    applications = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return render_template(
+        "add_interview.html",
+        applications=applications
+    )
+
 @app.route("/interviews")
 def interviews_page():
 

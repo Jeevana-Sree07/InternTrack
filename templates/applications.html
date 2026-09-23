@@ -25,7 +25,9 @@
 
         <div class="nav-links">
 
-            <a href="/">Dashboard</a>
+            <a href="/">
+                Dashboard
+            </a>
 
             <a href="/internships">
                 Internships
@@ -36,8 +38,8 @@
             </a>
 
             <a href="/interviews">
-    Interviews
-</a>
+                Interviews
+            </a>
 
         </div>
 
@@ -53,7 +55,7 @@
             <h1>My Applications</h1>
 
             <p>
-                Track the status of your internship applications.
+                Track and update the status of your internship applications.
             </p>
 
         </section>
@@ -80,6 +82,8 @@
                             <th>Application Date</th>
 
                             <th>Status</th>
+
+                            <th>Update Status</th>
 
                         </tr>
 
@@ -127,6 +131,62 @@
                                     {{ application.status }}
 
                                 </span>
+
+                            </td>
+
+
+                            <!-- Status Update -->
+
+                            <td>
+
+                                <form method="POST"
+                                      action="/update-status/{{ application.application_id }}"
+                                      class="status-form">
+
+                                    <select name="status">
+
+                                        <option value="Applied"
+                                            {% if application.status == 'Applied' %}
+                                                selected
+                                            {% endif %}>
+                                            Applied
+                                        </option>
+
+                                        <option value="Shortlisted"
+                                            {% if application.status == 'Shortlisted' %}
+                                                selected
+                                            {% endif %}>
+                                            Shortlisted
+                                        </option>
+
+                                        <option value="Interview"
+                                            {% if application.status == 'Interview' %}
+                                                selected
+                                            {% endif %}>
+                                            Interview
+                                        </option>
+
+                                        <option value="Selected"
+                                            {% if application.status == 'Selected' %}
+                                                selected
+                                            {% endif %}>
+                                            Selected
+                                        </option>
+
+                                        <option value="Rejected"
+                                            {% if application.status == 'Rejected' %}
+                                                selected
+                                            {% endif %}>
+                                            Rejected
+                                        </option>
+
+                                    </select>
+
+                                    <button type="submit">
+                                        Update
+                                    </button>
+
+                                </form>
 
                             </td>
 

@@ -398,3 +398,69 @@ tr:last-child td {
     }
 
 }
+.status-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-form select {
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    font-size: 13px;
+}
+
+.status-form button {
+    padding: 8px 12px;
+    background: #111827;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.status-form button:hover {
+    background: #374151;
+}
+.application-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.application-form input,
+.application-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    font-family: Arial, sans-serif;
+}
+
+.application-form textarea {
+    resize: vertical;
+}
+
+.application-form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    font-size: 14px;
+    background: white;
+    margin-bottom: 12px;
+}
+
+.application-form label {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.application-form form button {
+    margin-top: 10px;
+}
