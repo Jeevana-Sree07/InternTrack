@@ -168,7 +168,10 @@ def apply(internship_id):
             cursor.close()
             connection.close()
 
-            return f"Application failed: {error}", 400
+            if "Duplicate entry" in str(error):
+                return "You have already applied for this internship.", 400
+
+            return "Application failed. Please try again.", 400
 
     cursor.execute("""
         SELECT
@@ -257,7 +260,9 @@ def update_status(application_id):
         cursor.close()
         connection.close()
 
-        return f"Status update failed: {error}", 400
+        return "Status update failed. Please try again.", 400
+
+
 @app.route("/add-interview", methods=["GET", "POST"])
 def add_interview():
 
@@ -306,8 +311,7 @@ def add_interview():
             cursor.close()
             connection.close()
 
-            return f"Interview creation failed: {error}", 400
-
+            return "Interview creation failed. Please try again.", 400
 
     cursor.execute("""
         SELECT
@@ -335,6 +339,7 @@ def add_interview():
         "add_interview.html",
         applications=applications
     )
+
 
 @app.route("/interviews")
 def interviews_page():
