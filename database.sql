@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS interntrack;
 
-USE interntrack;
+
+USE defaultdb;
 
 
 -- =========================
