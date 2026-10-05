@@ -2,21 +2,162 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>InternTrack - Applications</title>
+    <title>InternTrack - My Applications</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .page-container {
+            max-width: 1100px;
+            margin: 45px auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            margin-bottom: 8px;
+            color: #172554;
+        }
+
+        .page-header p {
+            color: #666;
+        }
+
+        .applications-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 14px;
+            background: #f1f5f9;
+            color: #172554;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 15px 14px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #444;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status-selected {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .status-interview {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-shortlisted {
+            background: #ede9fe;
+            color: #6d28d9;
+        }
+
+        .status-form {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .status-form select {
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+        }
+
+        .update-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 7px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .update-button:hover {
+            background: #1d4ed8;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 45px 20px;
+            color: #666;
+        }
+
+        .empty-state h2 {
+            color: #172554;
+        }
+
+        .browse-button {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 11px 18px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 800px) {
+
+            .page-container {
+                margin: 25px 15px;
+            }
+
+            .applications-card {
+                padding: 15px;
+            }
+
+            table {
+                min-width: 850px;
+            }
+        }
+    </style>
 
 </head>
 
 <body>
 
-    <!-- Navigation Bar -->
-
+    <!-- Navigation -->
     <nav class="navbar">
 
         <div class="logo">
@@ -34,11 +175,15 @@
             </a>
 
             <a href="/applications">
-                Applications
+                My Applications
             </a>
 
             <a href="/interviews">
                 Interviews
+            </a>
+
+            <a href="/logout">
+                Logout
             </a>
 
         </div>
@@ -46,11 +191,10 @@
     </nav>
 
 
-    <!-- Main Content -->
+    <!-- Main -->
+    <main class="page-container">
 
-    <main class="container">
-
-        <section class="welcome">
+        <div class="page-header">
 
             <h1>My Applications</h1>
 
@@ -58,14 +202,12 @@
                 Track and update the status of your internship applications.
             </p>
 
-        </section>
+        </div>
 
 
-        <!-- Applications Table -->
+        {% if applications %}
 
-        <section class="applications-section">
-
-            <div class="table-container">
+            <div class="applications-card">
 
                 <table>
 
@@ -73,13 +215,11 @@
 
                         <tr>
 
-                            <th>Student</th>
-
                             <th>Company</th>
 
                             <th>Internship</th>
 
-                            <th>Application Date</th>
+                            <th>Applied On</th>
 
                             <th>Status</th>
 
@@ -94,103 +234,104 @@
 
                         {% for application in applications %}
 
-                        <tr>
+                            <tr>
 
-                            <td>
-                                {{ application.student_name }}
-                            </td>
+                                <td>
+                                    {{ application.company_name }}
+                                </td>
 
-                            <td>
-                                {{ application.company_name }}
-                            </td>
+                                <td>
+                                    {{ application.internship_title }}
+                                </td>
 
-                            <td>
-                                {{ application.internship_title }}
-                            </td>
+                                <td>
+                                    {{ application.application_date }}
+                                </td>
 
-                            <td>
-                                {{ application.application_date }}
-                            </td>
+                                <td>
 
-                            <td>
+                                    {% if application.status == "Selected" %}
 
-                                <span class="status
-                                    {% if application.status == 'Selected' %}
-                                        selected
-                                    {% elif application.status == 'Rejected' %}
-                                        rejected
-                                    {% elif application.status == 'Interview' %}
-                                        interview
-                                    {% elif application.status == 'Shortlisted' %}
-                                        shortlisted
-                                    {% else %}
-                                        applied
-                                    {% endif %}
-                                ">
-
-                                    {{ application.status }}
-
-                                </span>
-
-                            </td>
-
-
-                            <!-- Status Update -->
-
-                            <td>
-
-                                <form method="POST"
-                                      action="/update-status/{{ application.application_id }}"
-                                      class="status-form">
-
-                                    <select name="status">
-
-                                        <option value="Applied"
-                                            {% if application.status == 'Applied' %}
-                                                selected
-                                            {% endif %}>
-                                            Applied
-                                        </option>
-
-                                        <option value="Shortlisted"
-                                            {% if application.status == 'Shortlisted' %}
-                                                selected
-                                            {% endif %}>
-                                            Shortlisted
-                                        </option>
-
-                                        <option value="Interview"
-                                            {% if application.status == 'Interview' %}
-                                                selected
-                                            {% endif %}>
-                                            Interview
-                                        </option>
-
-                                        <option value="Selected"
-                                            {% if application.status == 'Selected' %}
-                                                selected
-                                            {% endif %}>
+                                        <span class="status status-selected">
                                             Selected
-                                        </option>
+                                        </span>
 
-                                        <option value="Rejected"
-                                            {% if application.status == 'Rejected' %}
-                                                selected
-                                            {% endif %}>
+                                    {% elif application.status == "Rejected" %}
+
+                                        <span class="status status-rejected">
                                             Rejected
-                                        </option>
+                                        </span>
 
-                                    </select>
+                                    {% elif application.status == "Interview" %}
 
-                                    <button type="submit">
-                                        Update
-                                    </button>
+                                        <span class="status status-interview">
+                                            Interview
+                                        </span>
 
-                                </form>
+                                    {% elif application.status == "Shortlisted" %}
 
-                            </td>
+                                        <span class="status status-shortlisted">
+                                            Shortlisted
+                                        </span>
 
-                        </tr>
+                                    {% else %}
+
+                                        <span class="status">
+                                            {{ application.status }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for('update_status', application_id=application.application_id) }}"
+                                        class="status-form">
+
+                                        <select name="status">
+
+                                            <option value="Applied"
+                                                {% if application.status == "Applied" %}selected{% endif %}>
+                                                Applied
+                                            </option>
+
+                                            <option value="Shortlisted"
+                                                {% if application.status == "Shortlisted" %}selected{% endif %}>
+                                                Shortlisted
+                                            </option>
+
+                                            <option value="Interview"
+                                                {% if application.status == "Interview" %}selected{% endif %}>
+                                                Interview
+                                            </option>
+
+                                            <option value="Selected"
+                                                {% if application.status == "Selected" %}selected{% endif %}>
+                                                Selected
+                                            </option>
+
+                                            <option value="Rejected"
+                                                {% if application.status == "Rejected" %}selected{% endif %}>
+                                                Rejected
+                                            </option>
+
+                                        </select>
+
+                                        <button
+                                            type="submit"
+                                            class="update-button">
+                                            Update
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
 
                         {% endfor %}
 
@@ -200,7 +341,29 @@
 
             </div>
 
-        </section>
+        {% else %}
+
+            <div class="applications-card">
+
+                <div class="empty-state">
+
+                    <h2>No Applications Yet</h2>
+
+                    <p>
+                        You haven't applied for any internships yet.
+                    </p>
+
+                    <a
+                        href="/internships"
+                        class="browse-button">
+                        Browse Internships
+                    </a>
+
+                </div>
+
+            </div>
+
+        {% endif %}
 
     </main>
 

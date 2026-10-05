@@ -1,9 +1,15 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from database import get_db_connection
 from datetime import date
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
+# Change this to a long random secret before production
+app.secret_key = "interntrack-secret-key-2026"
+
+
+# ---------------- DASHBOARD ----------------
 
 @app.route("/")
 def home():
@@ -11,25 +17,53 @@ def home():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute("SELECT COUNT(*) AS total FROM Internship")
+    # Total internships available
+    cursor.execute("""
+        SELECT COUNT(*) AS total
+        FROM Internship
+    """)
     total_internships = cursor.fetchone()["total"]
 
-    cursor.execute("SELECT COUNT(*) AS total FROM Application")
-    total_applications = cursor.fetchone()["total"]
+    # Personalized statistics
+    if "student_id" in session:
 
-    cursor.execute("""
-        SELECT COUNT(*) AS total
-        FROM Application
-        WHERE status = 'Interview'
-    """)
-    interviews = cursor.fetchone()["total"]
+        student_id = session["student_id"]
 
-    cursor.execute("""
-        SELECT COUNT(*) AS total
-        FROM Application
-        WHERE status = 'Selected'
-    """)
-    selected = cursor.fetchone()["total"]
+        # My applications
+        cursor.execute("""
+            SELECT COUNT(*) AS total
+            FROM Application
+            WHERE student_id = %s
+        """, (student_id,))
+
+        total_applications = cursor.fetchone()["total"]
+
+        # My interviews
+        cursor.execute("""
+            SELECT COUNT(*) AS total
+            FROM Interview iv
+            JOIN Application a
+                ON iv.application_id = a.application_id
+            WHERE a.student_id = %s
+        """, (student_id,))
+
+        interviews = cursor.fetchone()["total"]
+
+        # My selected applications
+        cursor.execute("""
+            SELECT COUNT(*) AS total
+            FROM Application
+            WHERE student_id = %s
+              AND status = 'Selected'
+        """, (student_id,))
+
+        selected = cursor.fetchone()["total"]
+
+    else:
+
+        total_applications = 0
+        interviews = 0
+        selected = 0
 
     cursor.close()
     connection.close()
@@ -42,6 +76,126 @@ def home():
         selected=selected
     )
 
+
+# ---------------- REGISTER ----------------
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+
+    if request.method == "POST":
+
+        name = request.form["name"].strip()
+        email = request.form["email"].strip()
+        phone = request.form["phone"].strip()
+        college = request.form["college"].strip()
+        graduation_year = request.form["graduation_year"]
+        password = request.form["password"]
+
+        if not name or not email or not password:
+            return "Name, email and password are required.", 400
+
+        if len(password) < 6:
+            return "Password must contain at least 6 characters.", 400
+
+        password_hash = generate_password_hash(password)
+
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        try:
+
+            cursor.execute("""
+                INSERT INTO Student
+                (name, email, phone, college, graduation_year, password_hash)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (
+                name,
+                email,
+                phone,
+                college,
+                graduation_year,
+                password_hash
+            ))
+
+            connection.commit()
+
+            cursor.close()
+            connection.close()
+
+            return redirect(url_for("login"))
+
+        except Exception as error:
+
+            connection.rollback()
+
+            cursor.close()
+            connection.close()
+
+            if "Duplicate entry" in str(error):
+                return "An account with this email already exists.", 400
+
+            return f"Registration failed: {error}", 400
+
+    return render_template("register.html")
+
+
+# ---------------- LOGIN ----------------
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    if request.method == "POST":
+
+        email = request.form["email"].strip()
+        password = request.form["password"]
+
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT
+                student_id,
+                name,
+                email,
+                password_hash
+            FROM Student
+            WHERE email = %s
+        """, (email,))
+
+        student = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        if student and student["password_hash"]:
+
+            if check_password_hash(
+                student["password_hash"],
+                password
+            ):
+
+                session["student_id"] = student["student_id"]
+                session["student_name"] = student["name"]
+                session["student_email"] = student["email"]
+
+                return redirect(url_for("home"))
+
+        return "Invalid email or password.", 401
+
+    return render_template("login.html")
+
+
+# ---------------- LOGOUT ----------------
+
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    return redirect(url_for("login"))
+
+
+# ---------------- INTERNSHIPS ----------------
 
 @app.route("/internships")
 def internships():
@@ -93,7 +247,9 @@ def internships():
     internships = cursor.fetchall()
 
     cursor.execute("""
-        SELECT skill_id, skill_name
+        SELECT
+            skill_id,
+            skill_name
         FROM Skill
         ORDER BY skill_name
     """)
@@ -111,8 +267,13 @@ def internships():
     )
 
 
+# ---------------- APPLY ----------------
+
 @app.route("/apply/<int:internship_id>", methods=["GET", "POST"])
 def apply(internship_id):
+
+    if "student_id" not in session:
+        return redirect(url_for("login"))
 
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -143,7 +304,7 @@ def apply(internship_id):
 
     if request.method == "POST":
 
-        student_id = request.form["student_id"]
+        student_id = session["student_id"]
         application_date = date.today()
 
         try:
@@ -152,7 +313,11 @@ def apply(internship_id):
                 INSERT INTO Application
                 (student_id, internship_id, application_date, status)
                 VALUES (%s, %s, %s, 'Applied')
-            """, (student_id, internship_id, application_date))
+            """, (
+                student_id,
+                internship_id,
+                application_date
+            ))
 
             connection.commit()
 
@@ -171,32 +336,27 @@ def apply(internship_id):
             if "Duplicate entry" in str(error):
                 return "You have already applied for this internship.", 400
 
+            if "Application deadline has passed" in str(error):
+                return "The application deadline has passed.", 400
+
             return "Application failed. Please try again.", 400
-
-    cursor.execute("""
-        SELECT
-            student_id,
-            name,
-            email,
-            college
-        FROM Student
-        ORDER BY name
-    """)
-
-    students = cursor.fetchall()
 
     cursor.close()
     connection.close()
 
     return render_template(
         "apply.html",
-        internship=internship,
-        students=students
+        internship=internship
     )
 
 
+# ---------------- APPLICATIONS ----------------
+
 @app.route("/applications")
 def applications():
+
+    if "student_id" not in session:
+        return redirect(url_for("login"))
 
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -216,8 +376,9 @@ def applications():
             ON a.internship_id = i.internship_id
         JOIN Company c
             ON i.company_id = c.company_id
+        WHERE a.student_id = %s
         ORDER BY a.application_date DESC
-    """)
+    """, (session["student_id"],))
 
     applications = cursor.fetchall()
 
@@ -230,8 +391,13 @@ def applications():
     )
 
 
+# ---------------- UPDATE STATUS ----------------
+
 @app.route("/update-status/<int:application_id>", methods=["POST"])
 def update_status(application_id):
+
+    if "student_id" not in session:
+        return redirect(url_for("login"))
 
     status = request.form["status"]
 
@@ -244,7 +410,12 @@ def update_status(application_id):
             UPDATE Application
             SET status = %s
             WHERE application_id = %s
-        """, (status, application_id))
+              AND student_id = %s
+        """, (
+            status,
+            application_id,
+            session["student_id"]
+        ))
 
         connection.commit()
 
@@ -253,7 +424,7 @@ def update_status(application_id):
 
         return redirect(url_for("applications"))
 
-    except Exception as error:
+    except Exception:
 
         connection.rollback()
 
@@ -263,8 +434,13 @@ def update_status(application_id):
         return "Status update failed. Please try again.", 400
 
 
+# ---------------- ADD INTERVIEW ----------------
+
 @app.route("/add-interview", methods=["GET", "POST"])
 def add_interview():
+
+    if "student_id" not in session:
+        return redirect(url_for("login"))
 
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -278,6 +454,26 @@ def add_interview():
         feedback = request.form["feedback"]
 
         try:
+
+            # Make sure the application belongs to the logged-in student
+            cursor.execute("""
+                SELECT application_id
+                FROM Application
+                WHERE application_id = %s
+                  AND student_id = %s
+            """, (
+                application_id,
+                session["student_id"]
+            ))
+
+            application = cursor.fetchone()
+
+            if application is None:
+
+                cursor.close()
+                connection.close()
+
+                return "Invalid application.", 403
 
             cursor.execute("""
                 INSERT INTO Interview
@@ -295,7 +491,11 @@ def add_interview():
                 UPDATE Application
                 SET status = 'Interview'
                 WHERE application_id = %s
-            """, (application_id,))
+                  AND student_id = %s
+            """, (
+                application_id,
+                session["student_id"]
+            ))
 
             connection.commit()
 
@@ -304,7 +504,7 @@ def add_interview():
 
             return redirect(url_for("interviews_page"))
 
-        except Exception as error:
+        except Exception:
 
             connection.rollback()
 
@@ -326,9 +526,10 @@ def add_interview():
             ON a.internship_id = i.internship_id
         JOIN Company c
             ON i.company_id = c.company_id
-        WHERE a.status IN ('Shortlisted', 'Interview')
+        WHERE a.student_id = %s
+          AND a.status IN ('Shortlisted', 'Interview')
         ORDER BY a.application_id
-    """)
+    """, (session["student_id"],))
 
     applications = cursor.fetchall()
 
@@ -341,8 +542,13 @@ def add_interview():
     )
 
 
+# ---------------- INTERVIEWS ----------------
+
 @app.route("/interviews")
 def interviews_page():
+
+    if "student_id" not in session:
+        return redirect(url_for("login"))
 
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -366,8 +572,9 @@ def interviews_page():
             ON a.internship_id = i.internship_id
         JOIN Company c
             ON i.company_id = c.company_id
+        WHERE a.student_id = %s
         ORDER BY iv.interview_date
-    """)
+    """, (session["student_id"],))
 
     interviews = cursor.fetchall()
 
@@ -380,5 +587,11 @@ def interviews_page():
     )
 
 
+# ---------------- RUN APPLICATION ----------------
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        debug=False
+    )

@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -11,12 +10,113 @@
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
 
+    <style>
+        .page-container {
+            max-width: 700px;
+            margin: 45px auto;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            margin-bottom: 8px;
+            color: #172554;
+        }
+
+        .page-header p {
+            color: #666;
+        }
+
+        .form-card {
+            background: white;
+            padding: 32px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 600;
+            color: #172554;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background: #1d4ed8;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 18px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .no-applications {
+            background: white;
+            padding: 35px;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .no-applications h2 {
+            color: #172554;
+        }
+    </style>
+
 </head>
 
 <body>
 
-    <!-- Navigation Bar -->
-
+    <!-- Navigation -->
     <nav class="navbar">
 
         <div class="logo">
@@ -34,11 +134,15 @@
             </a>
 
             <a href="/applications">
-                Applications
+                My Applications
             </a>
 
             <a href="/interviews">
                 Interviews
+            </a>
+
+            <a href="/logout">
+                Logout
             </a>
 
         </div>
@@ -46,130 +150,176 @@
     </nav>
 
 
-    <!-- Main Content -->
+    <!-- Main -->
+    <main class="page-container">
 
-    <main class="container">
+        <div class="page-header">
 
-        <section class="welcome">
-
-            <h1>Add Interview</h1>
+            <h1>Add Interview Round</h1>
 
             <p>
-                Schedule and record an internship interview round.
+                Record an interview round for a shortlisted application.
             </p>
 
-        </section>
+        </div>
 
 
-        <!-- Interview Form -->
+        {% if applications %}
 
-        <section class="application-form">
+            <div class="form-card">
 
-            <form method="POST">
-
-
-                <!-- Application -->
-
-                <label for="application_id">
-                    Application
-                </label>
-
-                <select name="application_id"
-                        id="application_id"
-                        required>
-
-                    <option value="">
-                        -- Select Application --
-                    </option>
-
-                    {% for application in applications %}
-
-                    <option value="{{ application.application_id }}">
-
-                        {{ application.student_name }}
-                        -
-                        {{ application.company_name }}
-                        -
-                        {{ application.internship_title }}
-
-                    </option>
-
-                    {% endfor %}
-
-                </select>
+                <form method="POST">
 
 
-                <!-- Round Number -->
+                    <!-- Application -->
+                    <div class="form-group">
 
-                <label for="round_number">
-                    Interview Round
-                </label>
+                        <label for="application_id">
+                            Application
+                        </label>
 
-                <input type="number"
-                       name="round_number"
-                       id="round_number"
-                       min="1"
-                       required>
+                        <select
+                            id="application_id"
+                            name="application_id"
+                            required>
 
+                            <option value="">
+                                Select an application
+                            </option>
 
-                <!-- Interview Date -->
+                            {% for application in applications %}
 
-                <label for="interview_date">
-                    Interview Date
-                </label>
+                                <option value="{{ application.application_id }}">
 
-                <input type="date"
-                       name="interview_date"
-                       id="interview_date"
-                       required>
+                                    {{ application.student_name }}
+                                    -
+                                    {{ application.company_name }}
+                                    -
+                                    {{ application.internship_title }}
 
+                                </option>
 
-                <!-- Result -->
+                            {% endfor %}
 
-                <label for="result">
-                    Result
-                </label>
+                        </select>
 
-                <select name="result"
-                        id="result"
-                        required>
-
-                    <option value="Pending">
-                        Pending
-                    </option>
-
-                    <option value="Passed">
-                        Passed
-                    </option>
-
-                    <option value="Failed">
-                        Failed
-                    </option>
-
-                </select>
+                    </div>
 
 
-                <!-- Feedback -->
+                    <!-- Round -->
+                    <div class="form-group">
 
-                <label for="feedback">
-                    Feedback
-                </label>
+                        <label for="round_number">
+                            Interview Round
+                        </label>
 
-                <textarea name="feedback"
-                          id="feedback"
-                          rows="4"
-                          placeholder="Enter interview feedback"></textarea>
+                        <input
+                            type="number"
+                            id="round_number"
+                            name="round_number"
+                            min="1"
+                            placeholder="e.g. 1"
+                            required>
+
+                    </div>
 
 
-                <!-- Submit -->
+                    <!-- Date -->
+                    <div class="form-group">
 
-                <button type="submit">
-                    Add Interview
-                </button>
+                        <label for="interview_date">
+                            Interview Date
+                        </label>
 
-            </form>
+                        <input
+                            type="date"
+                            id="interview_date"
+                            name="interview_date">
 
-        </section>
+                    </div>
+
+
+                    <!-- Result -->
+                    <div class="form-group">
+
+                        <label for="result">
+                            Result
+                        </label>
+
+                        <select
+                            id="result"
+                            name="result"
+                            required>
+
+                            <option value="Pending">
+                                Pending
+                            </option>
+
+                            <option value="Passed">
+                                Passed
+                            </option>
+
+                            <option value="Failed">
+                                Failed
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Feedback -->
+                    <div class="form-group">
+
+                        <label for="feedback">
+                            Feedback
+                        </label>
+
+                        <textarea
+                            id="feedback"
+                            name="feedback"
+                            placeholder="Enter interview feedback..."></textarea>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="submit-button">
+                        Save Interview
+                    </button>
+
+                </form>
+
+
+                <a
+                    href="/interviews"
+                    class="back-link">
+                    ← Back to Interviews
+                </a>
+
+            </div>
+
+        {% else %}
+
+            <div class="no-applications">
+
+                <h2>No Eligible Applications</h2>
+
+                <p>
+                    There are currently no shortlisted applications
+                    available for an interview.
+                </p>
+
+                <a
+                    href="/applications"
+                    class="back-link">
+                    ← Back to Applications
+                </a>
+
+            </div>
+
+        {% endif %}
 
     </main>
 

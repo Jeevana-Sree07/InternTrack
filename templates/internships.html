@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -11,12 +10,151 @@
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
 
+    <style>
+        .page-container {
+            max-width: 1100px;
+            margin: 45px auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            margin-bottom: 8px;
+            color: #172554;
+        }
+
+        .page-header p {
+            color: #666;
+        }
+
+        .search-card {
+            background: white;
+            padding: 22px;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+            margin-bottom: 30px;
+        }
+
+        .search-card form {
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-card input,
+        .search-card select {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .search-button {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            background: #1d4ed8;
+        }
+
+        .internship-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+        }
+
+        .internship-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease;
+        }
+
+        .internship-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .internship-card h2 {
+            margin-top: 0;
+            color: #172554;
+            font-size: 21px;
+        }
+
+        .company {
+            color: #2563eb;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .info {
+            margin-bottom: 18px;
+        }
+
+        .info p {
+            margin: 7px 0;
+            color: #444;
+        }
+
+        .apply-button {
+            display: block;
+            text-align: center;
+            padding: 11px;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .apply-button:hover {
+            background: #1d4ed8;
+        }
+
+        .no-results {
+            background: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 12px;
+            color: #666;
+        }
+
+        @media (max-width: 750px) {
+
+            .page-container {
+                margin: 25px 15px;
+            }
+
+            .internship-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-card form {
+                flex-direction: column;
+            }
+
+        }
+    </style>
+
 </head>
 
 <body>
 
-    <!-- Navigation Bar -->
-
+    <!-- Navigation -->
     <nav class="navbar">
 
         <div class="logo">
@@ -34,11 +172,15 @@
             </a>
 
             <a href="/applications">
-                Applications
+                My Applications
             </a>
 
             <a href="/interviews">
                 Interviews
+            </a>
+
+            <a href="/logout">
+                Logout
             </a>
 
         </div>
@@ -46,122 +188,105 @@
     </nav>
 
 
-    <!-- Main Content -->
+    <!-- Main -->
+    <main class="page-container">
 
-    <main class="container">
+        <div class="page-header">
 
-        <section class="welcome">
-
-            <h1>Available Internships</h1>
+            <h1>Internship Opportunities</h1>
 
             <p>
-                Explore internship opportunities and find the right role for you.
+                Explore internships and find opportunities that match your skills.
             </p>
 
-        </section>
+        </div>
 
 
-        <!-- Skill Search -->
-
-        <section class="skill-search">
+        <!-- Search -->
+        <div class="search-card">
 
             <form method="GET" action="/internships">
 
-                <label for="skill">
-                    Search by Skill
-                </label>
+                <input
+                    type="text"
+                    name="skill"
+                    placeholder="Search by skill e.g. Python, Java, SQL"
+                    value="{{ selected_skill }}"
+                >
 
-                <select name="skill" id="skill">
-
-                    <option value="">
-                        All Skills
-                    </option>
-
-                    {% for skill in skills %}
-
-                    <option value="{{ skill.skill_name }}"
-                        {% if selected_skill == skill.skill_name %}
-                            selected
-                        {% endif %}>
-
-                        {{ skill.skill_name }}
-
-                    </option>
-
-                    {% endfor %}
-
-                </select>
-
-                <button type="submit">
+                <button
+                    type="submit"
+                    class="search-button">
                     Search
                 </button>
 
-                <a href="/internships" class="clear-button">
-                    Clear
-                </a>
-
             </form>
 
-        </section>
+        </div>
 
 
         <!-- Internship Cards -->
+        {% if internships %}
 
-        <section class="internship-grid">
+            <div class="internship-grid">
 
-            {% for internship in internships %}
+                {% for internship in internships %}
 
-            <div class="internship-card">
+                    <div class="internship-card">
 
-                <div class="company">
-                    {{ internship.company_name }}
-                </div>
+                        <h2>
+                            {{ internship.title }}
+                        </h2>
 
-                <h2>
-                    {{ internship.title }}
-                </h2>
+                        <div class="company">
+                            {{ internship.company_name }}
+                        </div>
 
-                <p class="description">
-                    {{ internship.description }}
-                </p>
+                        <p class="description">
+                            {{ internship.description }}
+                        </p>
 
-                <div class="internship-info">
+                        <div class="info">
 
-                    <span>
-                        📍 {{ internship.location }}
-                    </span>
+                            <p>
+                                📍 {{ internship.location }}
+                            </p>
 
-                    <span>
-                        💰 ₹{{ internship.stipend }}
-                    </span>
+                            <p>
+                                💰 ₹{{ internship.stipend }}
+                            </p>
 
-                    <span>
-                        📅 Deadline: {{ internship.deadline }}
-                    </span>
+                            <p>
+                                📅 Deadline: {{ internship.deadline }}
+                            </p>
 
-                </div>
+                        </div>
 
+                        <a
+                            href="{{ url_for('apply', internship_id=internship.internship_id) }}"
+                            class="apply-button">
+                            Apply Now
+                        </a>
 
-                <!-- Apply Button -->
+                    </div>
 
-                <a href="/apply/{{ internship.internship_id }}"
-                   class="apply-button">
-
-                    Apply Now
-
-                </a>
+                {% endfor %}
 
             </div>
 
-            {% else %}
+        {% else %}
 
-            <p>
-                No internships found for the selected skill.
-            </p>
+            <div class="no-results">
 
-            {% endfor %}
+                <h3>No internships found</h3>
 
-        </section>
+                <p>
+                    Try searching for another skill.
+                </p>
+
+            </div>
+
+        {% endif %}
 
     </main>
 

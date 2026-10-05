@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -11,10 +10,167 @@
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
 
+    <style>
+        .page-container {
+            max-width: 1100px;
+            margin: 45px auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            margin-bottom: 8px;
+            color: #172554;
+        }
+
+        .page-header p {
+            color: #666;
+        }
+
+        .interview-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .interview-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            gap: 20px;
+        }
+
+        .interview-top h2 {
+            margin: 0;
+            color: #172554;
+            font-size: 20px;
+        }
+
+        .round {
+            padding: 7px 13px;
+            border-radius: 20px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .company {
+            color: #2563eb;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .detail {
+            background: #f8fafc;
+            padding: 12px 15px;
+            border-radius: 8px;
+        }
+
+        .detail strong {
+            display: block;
+            color: #172554;
+            margin-bottom: 4px;
+        }
+
+        .detail span {
+            color: #555;
+        }
+
+        .result {
+            display: inline-block;
+            padding: 6px 13px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .result-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .result-passed {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .result-failed {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .feedback {
+            margin-top: 18px;
+            padding: 15px;
+            background: #f8fafc;
+            border-left: 4px solid #2563eb;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .empty-state {
+            background: white;
+            text-align: center;
+            padding: 50px 20px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .empty-state h2 {
+            color: #172554;
+        }
+
+        .add-button {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 11px 18px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .add-button:hover {
+            background: #1d4ed8;
+        }
+
+        @media (max-width: 700px) {
+
+            .page-container {
+                margin: 25px 15px;
+            }
+
+            .details {
+                grid-template-columns: 1fr;
+            }
+
+            .interview-top {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+
 </head>
 
 <body>
 
+    <!-- Navigation -->
     <nav class="navbar">
 
         <div class="logo">
@@ -23,18 +179,24 @@
 
         <div class="nav-links">
 
-            <a href="/">Dashboard</a>
+            <a href="/">
+                Dashboard
+            </a>
 
             <a href="/internships">
                 Internships
             </a>
 
             <a href="/applications">
-                Applications
+                My Applications
             </a>
 
             <a href="/interviews">
                 Interviews
+            </a>
+
+            <a href="/logout">
+                Logout
             </a>
 
         </div>
@@ -42,113 +204,151 @@
     </nav>
 
 
-    <main class="container">
+    <!-- Main -->
+    <main class="page-container">
 
-        <section class="welcome">
+       <div class="page-header">
 
-            <h1>Interview Tracker</h1>
+    <div class="header-row">
+
+        <div>
+            <h1>Interview Rounds</h1>
 
             <p>
                 Track your internship interview rounds, results and feedback.
             </p>
+        </div>
 
-        </section>
+        <a href="/add-interview" class="add-interview-button">
+            + Add Interview
+        </a>
 
-<div class="interview-actions">
-
-    <a href="/add-interview" class="apply-button">
-        + Add Interview
-    </a>
+    </div>
 
 </div>
-        <section class="applications-section">
 
-            <div class="table-container">
+        {% if interviews %}
 
-                <table>
+            {% for interview in interviews %}
 
-                    <thead>
+                <div class="interview-card">
 
-                        <tr>
+                    <div class="interview-top">
 
-                            <th>Student</th>
+                        <h2>
+                            {{ interview.internship_title }}
+                        </h2>
 
-                            <th>Company</th>
+                        <span class="round">
+                            Round {{ interview.round_number }}
+                        </span>
 
-                            <th>Internship</th>
-
-                            <th>Round</th>
-
-                            <th>Interview Date</th>
-
-                            <th>Result</th>
-
-                            <th>Feedback</th>
-
-                        </tr>
-
-                    </thead>
+                    </div>
 
 
-                    <tbody>
+                    <div class="company">
+                        {{ interview.company_name }}
+                    </div>
 
-                        {% for interview in interviews %}
 
-                        <tr>
+                    <div class="details">
 
-                            <td>
+                        <div class="detail">
+
+                            <strong>
+                                Student
+                            </strong>
+
+                            <span>
                                 {{ interview.student_name }}
-                            </td>
+                            </span>
 
-                            <td>
-                                {{ interview.company_name }}
-                            </td>
+                        </div>
 
-                            <td>
-                                {{ interview.internship_title }}
-                            </td>
 
-                            <td>
-                                Round {{ interview.round_number }}
-                            </td>
+                        <div class="detail">
 
-                            <td>
-                                {{ interview.interview_date }}
-                            </td>
+                            <strong>
+                                Interview Date
+                            </strong>
 
-                            <td>
+                            <span>
+                                {{ interview.interview_date or "Not scheduled" }}
+                            </span>
 
-                                <span class="status
-                                    {% if interview.result == 'Passed' %}
-                                        selected
-                                    {% elif interview.result == 'Failed' %}
-                                        rejected
-                                    {% else %}
-                                        interview
-                                    {% endif %}
-                                ">
+                        </div>
 
-                                    {{ interview.result }}
 
-                                </span>
+                        <div class="detail">
 
-                            </td>
+                            <strong>
+                                Result
+                            </strong>
 
-                            <td>
-                                {{ interview.feedback or 'No feedback yet' }}
-                            </td>
+                            <span>
 
-                        </tr>
+                                {% if interview.result == "Passed" %}
 
-                        {% endfor %}
+                                    <span class="result result-passed">
+                                        Passed
+                                    </span>
 
-                    </tbody>
+                                {% elif interview.result == "Failed" %}
 
-                </table>
+                                    <span class="result result-failed">
+                                        Failed
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="result result-pending">
+                                        Pending
+                                    </span>
+
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    {% if interview.feedback %}
+
+                        <div class="feedback">
+
+                            <strong>Feedback:</strong>
+
+                            {{ interview.feedback }}
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <h2>No Interviews Yet</h2>
+
+                <p>
+                    Your interview rounds will appear here once they are added.
+                </p>
+
+                <a
+                    href="/add-interview"
+                    class="add-button">
+                    Add Interview
+                </a>
 
             </div>
 
-        </section>
+        {% endif %}
 
     </main>
 

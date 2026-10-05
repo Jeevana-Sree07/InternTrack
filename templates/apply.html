@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -11,12 +10,95 @@
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
 
+    <style>
+        .apply-container {
+            max-width: 750px;
+            margin: 50px auto;
+        }
+
+        .apply-card {
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .apply-card h1 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: #172554;
+        }
+
+        .apply-card h2 {
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: #2563eb;
+        }
+
+        .details {
+            margin-bottom: 25px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .detail-label {
+            width: 130px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .detail-value {
+            color: #555;
+        }
+
+        .applicant-box {
+            background: #f1f5f9;
+            padding: 15px 18px;
+            border-radius: 10px;
+            margin: 25px 0;
+        }
+
+        .applicant-box strong {
+            color: #172554;
+        }
+
+        .confirm-button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 9px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .confirm-button:hover {
+            background: #1d4ed8;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 18px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- Navigation Bar -->
-
+    <!-- Navigation -->
     <nav class="navbar">
 
         <div class="logo">
@@ -25,18 +107,24 @@
 
         <div class="nav-links">
 
-            <a href="/">Dashboard</a>
+            <a href="/">
+                Dashboard
+            </a>
 
             <a href="/internships">
                 Internships
             </a>
 
             <a href="/applications">
-                Applications
+                My Applications
             </a>
 
             <a href="/interviews">
                 Interviews
+            </a>
+
+            <a href="/logout">
+                Logout
             </a>
 
         </div>
@@ -44,102 +132,101 @@
     </nav>
 
 
-    <!-- Main Content -->
+    <!-- Apply Section -->
+    <main class="apply-container">
 
-    <main class="container">
-
-        <section class="welcome">
+        <div class="apply-card">
 
             <h1>Apply for Internship</h1>
 
-            <p>
-                Submit your application for the selected internship.
-            </p>
-
-        </section>
+            <h2>
+                {{ internship.title }}
+            </h2>
 
 
-        <!-- Internship Details -->
+            <div class="details">
 
-        <section class="apply-layout">
+                <div class="detail-row">
 
+                    <div class="detail-label">
+                        Company
+                    </div>
 
-            <div class="internship-card">
+                    <div class="detail-value">
+                        {{ internship.company_name }}
+                    </div>
 
-                <div class="company">
-                    {{ internship.company_name }}
                 </div>
 
-                <h2>
-                    {{ internship.title }}
-                </h2>
 
-                <p class="description">
-                    {{ internship.description }}
-                </p>
+                <div class="detail-row">
 
-                <div class="internship-info">
+                    <div class="detail-label">
+                        Location
+                    </div>
 
-                    <span>
-                        📍 {{ internship.location }}
-                    </span>
+                    <div class="detail-value">
+                        {{ internship.location }}
+                    </div>
 
-                    <span>
-                        💰 ₹{{ internship.stipend }}
-                    </span>
+                </div>
 
-                    <span>
-                        📅 Deadline: {{ internship.deadline }}
-                    </span>
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        Stipend
+                    </div>
+
+                    <div class="detail-value">
+                        ₹{{ internship.stipend }}
+                    </div>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <div class="detail-label">
+                        Deadline
+                    </div>
+
+                    <div class="detail-value">
+                        {{ internship.deadline }}
+                    </div>
 
                 </div>
 
             </div>
 
 
-            <!-- Application Form -->
+            <div class="applicant-box">
 
-            <div class="application-form">
+                Applying as:
 
-                <h2>Application Form</h2>
-
-                <form method="POST">
-
-                    <label for="student_id">
-                        Select Student
-                    </label>
-
-                    <select name="student_id"
-                            id="student_id"
-                            required>
-
-                        <option value="">
-                            -- Select Student --
-                        </option>
-
-                        {% for student in students %}
-
-                        <option value="{{ student.student_id }}">
-
-                            {{ student.name }} -
-                            {{ student.email }}
-
-                        </option>
-
-                        {% endfor %}
-
-                    </select>
-
-
-                    <button type="submit">
-                        Submit Application
-                    </button>
-
-                </form>
+                <strong>
+                    {{ session["student_name"] }}
+                </strong>
 
             </div>
 
-        </section>
+
+            <form method="POST">
+
+                <button
+                    type="submit"
+                    class="confirm-button">
+                    Confirm Application
+                </button>
+
+            </form>
+
+
+            <a href="/internships" class="back-link">
+                ← Back to Internships
+            </a>
+
+        </div>
 
     </main>
 
