@@ -157,38 +157,27 @@
 
 <body>
 
-    <!-- Navigation -->
-    <nav class="navbar">
+  
+<!-- Navigation Bar -->
+<nav class="navbar">
+    <div class="logo">
+        InternTrack
+    </div>
 
-        <div class="logo">
-            InternTrack
-        </div>
+    <div class="nav-links">
+        <a href="/">Dashboard</a>
+        <a href="/internships">Internships</a>
+        <a href="/applications">Applications</a>
+        <a href="/interviews">Interviews</a>
 
-        <div class="nav-links">
-
-            <a href="/">
-                Dashboard
-            </a>
-
-            <a href="/internships">
-                Internships
-            </a>
-
-            <a href="/applications">
-                My Applications
-            </a>
-
-            <a href="/interviews">
-                Interviews
-            </a>
-
-            <a href="/logout">
-                Logout
-            </a>
-
-        </div>
-
-    </nav>
+        {% if session.get("student_id") %}
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/register">Register</a>
+            <a href="/login">Login</a>
+        {% endif %}
+    </div>
+</nav>
 
 
     <!-- Main -->
